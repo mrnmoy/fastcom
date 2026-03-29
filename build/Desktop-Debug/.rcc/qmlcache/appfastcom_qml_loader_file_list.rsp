@@ -1,0 +1,5 @@
+--resource
+/home/notscripter/fastcom/build/Desktop-Debug/.qt/rcc/qmake_fastcom.qrc
+--resource
+/home/notscripter/fastcom/build/Desktop-Debug/.qt/rcc/appfastcom_raw_qml_0.qrc
+/qt/qml/fastcom/Main.qml

@@ -1,0 +1,6 @@
+module fastcom
+typeinfo appfastcom.qmltypes
+prefer :/qt/qml/fastcom/
+Main 254.0 Main.qml
+depends QtQuick
+

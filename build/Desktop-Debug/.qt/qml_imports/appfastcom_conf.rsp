@@ -1,0 +1,14 @@
+-rootPath
+/home/notscripter/fastcom
+-cmake-output
+-output-file
+/home/notscripter/fastcom/build/Desktop-Debug/.qt/qml_imports/appfastcom_conf.cmake
+-importPath
+/home/notscripter/fastcom/build/Desktop-Debug
+-importPath
+/home/notscripter/fastcom/build/Desktop-Debug/fastcom
+-importPath
+/usr/lib/qt6/qml
+-qrcFiles
+/home/notscripter/fastcom/build/Desktop-Debug/.qt/rcc/qmake_fastcom.qrc
+/home/notscripter/fastcom/build/Desktop-Debug/.qt/rcc/appfastcom_raw_qml_0.qrc
