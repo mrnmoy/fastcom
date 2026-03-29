@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="/qt/qml/fastcom">
-    <file alias="qmldir">/home/notscripter/fastcom/build/Desktop-Debug/fastcom/qmldir</file>
-  </qresource>
-</RCC>
-
