@@ -21,8 +21,8 @@ Window {
         id: serialManager
 
         onStatusChanged: status => output.append(addTime(status ? "Port opened" : "Port closed"))
-        // onReceived: msg => output.append(addTime(msg))
-        onReceived: data => output.append(data)
+        onReceived: data => output.text += data
+        onReceivedLn: output.append(`[${getTime()}] `)
         onError: err => output.append(addTime("Error: " + err))
     }
 
@@ -68,7 +68,6 @@ Window {
             background: Rectangle {
                 border.width: 2
                 radius: 8
-                opacity: tcpServer.isConnected ? 1 : 0.5
                 color: "#f38ba8"
             }
         }
