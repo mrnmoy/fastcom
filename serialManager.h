@@ -16,7 +16,8 @@ public:
   SerialManager();
   QList<QSerialPortInfo> availablePorts = QSerialPortInfo::availablePorts();
   QStringListModel *availablePortNames;
-  QStringList availableBaudRates;
+  QStringList availableBaudRates = {"1200",  "2400",  "4800",  "9600",
+                                    "19200", "38400", "57600", "115200"};
 
 signals:
   // void availablePorts();
@@ -26,9 +27,7 @@ signals:
   void error(QString err);
 
 public slots:
-  void open(QString portName,
-            QSerialPort::BaudRate baudRate = QSerialPort::Baud115200,
-            QSerialPort::Direction direction = QSerialPort::AllDirections);
+  void open(QString portName, qint64 baudRate);
   void close();
   qint64 send(QString msg);
 

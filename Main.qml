@@ -25,7 +25,7 @@ Window {
                 time: getTime(),
                 type: "system"
             })
-        onReceived: data => output.text += data
+        onReceived: data => outputList.section += data
         onReceivedLn: output.append({
             str: "",
             time: getTime(),
@@ -52,8 +52,9 @@ Window {
             Universal.foreground: "#11111b"
             text: "Start"
             onClicked: {
-                serialManager.open("/dev/ttyUSB0");
-                console.log(serialManager.availablePortNames[0]);
+                serialManager.open(portName.currentValue, baudRate.currentValue);
+                // console.log(portName.currentValue);
+                // console.log(serialManager.availableBaudRates[0]);
             }
             background: Rectangle {
                 border.width: 2
@@ -118,19 +119,36 @@ Window {
 
             RowLayout {
                 ComboBox {
-                    // model: ["lol", "lol2"]
-                    model: serialManager.availablePortNames
-                    // model: ListModel {
-                    //     id: portList
+                    id: portName
+                    font.pixelSize: 16
+                    enabled: !serialManager.isConnected
+                    model: ["ttyUSB0", "ttyUSB1"]
+                    // background: Rectangle {
+                    // radius: 8
+                    //     color: "#1e1e2e"
                     // }
-                    // delegate: Text {
-                    //     text:
-                    // }
+                    delegate: ItemDelegate {
+                        width: parent.width
+                        font.pixelSize: 16
+                        // height: 24
+                        text: modelData
+                        // radius: 8
+                        // color: "#1e1e2e"
+                        highlighted: ListView.isCurrentItem
+                        onClicked: portName.currentIndex = index
+
+                        required property int index
+                        required property string modelData
+                    }
+                    // model: serialManager.availablePortNames
                 }
 
                 ComboBox {
-                    // model: ["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
-                    model: serialManager.availableBaudRates
+                    id: baudRate
+                    font.pixelSize: 16
+                    enabled: !serialManager.isConnected
+                    model: ["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
+                    // model: serialManager.availableBaudRates
                 }
 
                 // TextField {
