@@ -4,12 +4,14 @@ project(fastcom VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
 qt_add_executable(appfastcom
     main.cpp
+    serialManager.cpp 
+    serialManager.h
 )
 
 qt_add_qml_module(appfastcom
@@ -17,6 +19,17 @@ qt_add_qml_module(appfastcom
     QML_FILES
         Main.qml
 )
+
+qt_add_resources(appfastcom "images"
+    PREFIX "/"
+    FILES
+        bin.png
+)
+
+# qt_add_qml_module(serial
+#     URI Serial
+#     SOURCES serial.cpp serial.h
+# )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -30,7 +43,7 @@ set_target_properties(appfastcom PROPERTIES
 )
 
 target_link_libraries(appfastcom
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Quick Qt6::SerialPort
 )
 
 install(TARGETS appfastcom
