@@ -32,9 +32,10 @@ Window {
             type: "read"
         })
         onError: err => output.append({
-                str: "Error: " + err,
+                str: err,
                 time: getTime(),
-                type: "system"
+                type: "system",
+                subType: "error"
             })
     }
 
@@ -52,7 +53,7 @@ Window {
             text: "Start"
             onClicked: {
                 serialManager.open("/dev/ttyUSB0");
-                console.log(serialManager.availablePorts[0].portName());
+                console.log(serialManager.availablePortNames[0]);
             }
             background: Rectangle {
                 border.width: 2
@@ -127,6 +128,11 @@ Window {
                     // }
                 }
 
+                ComboBox {
+                    // model: ["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
+                    model: serialManager.availableBaudRates
+                }
+
                 // TextField {
                 //     id: host
                 //     implicitHeight: parent.height
@@ -173,7 +179,7 @@ Window {
                     text: _str
                     font.pixelSize: 16
                     readOnly: true
-                    color: "#cdd6f4"
+                    color: _subType == "error" ? "#f38ba8" : _subType == "warning" ? "#f9e2af" : "#cdd6f4"
                     background: Rectangle {
                         radius: 8
                         color: "#1e1e2e"
@@ -255,39 +261,10 @@ Window {
                 id: outputLoader
                 property string _str: str
                 property string _time: time
+                property string _subType: subType
                 sourceComponent: type == "system" ? systemOutputComp : type == "write" ? writeOutputComp : readOutputComp
             }
         }
-        // Item {
-        //     Layout.fillWidth: true
-        //     Layout.fillHeight: true
-        //
-        //     ScrollView {
-        //         anchors.fill: parent
-        //
-        //         TextArea {
-        //             id: output
-        //             readOnly: true
-        //             font.pixelSize: 16
-        //             background: Rectangle {
-        //                 border.width: 2
-        //                 radius: 8
-        //                 color: "#1e1e2e"
-        //             }
-        //         }
-        //     }
-        //
-        //     Button {
-        //         x: parent.width - 40
-        //         y: 8
-        //         icon.color: "#f38ba8"
-        //         icon.source: "qrc:/bin.png"
-        //         onClicked: output.clear()
-        //         background: Rectangle {
-        //             color: "transparent"
-        //         }
-        //     }
-        // }
 
         RowLayout {
             TextField {
@@ -315,7 +292,6 @@ Window {
                 enabled: serialManager.isConnected && input.text != "" ? true : false
                 onClicked: {
                     serialManager.send(input.text);
-                    console.log("sent: ", input.text);
                     output.append({
                         str: input.text,
                         time: getTime(),
@@ -337,7 +313,8 @@ Window {
         output.append({
             str: "Application started",
             time: getTime(),
-            type: "system"
+            type: "system",
+            subType: "info"
         });
     }
 

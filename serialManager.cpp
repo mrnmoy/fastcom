@@ -3,13 +3,20 @@
 SerialManager::SerialManager() : QObject() {
   status = false;
   serialPort = new QSerialPort();
+
+  availableBaudRates = {"1200",  "2400",  "4800",  "9600",
+                        "19200", "38400", "57600", "115200"};
   // availablePorts = serialPortInfo->availablePorts();
   // availablePorts = QSerialPortInfo::availablePorts();
 
+  availablePortNames = new QStringListModel();
+  QStringList portNames;
   for (QSerialPortInfo port : QSerialPortInfo::availablePorts()) {
-    availablePortNames.append(port.portName());
-    qDebug() << port.portName() << "\n";
+    portNames << port.portName();
+    // availablePortNames.append(port.portName());
+    // qDebug() << port.portName() << "\n";
   }
+  availablePortNames->setStringList(portNames);
 }
 
 bool SerialManager::getStatus() { return status; }

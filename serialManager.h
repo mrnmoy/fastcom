@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QSerialPort>
 #include <QSerialPortInfo>
-#include <QTimer>
+#include <QStringListModel>
 
 class SerialManager : public QObject {
   Q_OBJECT
@@ -15,7 +15,8 @@ class SerialManager : public QObject {
 public:
   SerialManager();
   QList<QSerialPortInfo> availablePorts = QSerialPortInfo::availablePorts();
-  QStringList availablePortNames;
+  QStringListModel *availablePortNames;
+  QStringList availableBaudRates;
 
 signals:
   // void availablePorts();
