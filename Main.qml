@@ -20,10 +20,22 @@ Window {
     SerialManager {
         id: serialManager
 
-        onStatusChanged: status => output.append(addTime(status ? "Port opened" : "Port closed"))
+        onStatusChanged: status => output.append({
+                str: status ? "Port opened" : "Port closed",
+                time: getTime(),
+                type: "system"
+            })
         onReceived: data => output.text += data
-        onReceivedLn: output.append(`[${getTime()}] `)
-        onError: err => output.append(addTime("Error: " + err))
+        onReceivedLn: output.append({
+            str: "",
+            time: getTime(),
+            type: "read"
+        })
+        onError: err => output.append({
+                str: "Error: " + err,
+                time: getTime(),
+                type: "system"
+            })
     }
 
     Component {
@@ -40,6 +52,7 @@ Window {
             text: "Start"
             onClicked: {
                 serialManager.open("/dev/ttyUSB0");
+                console.log(serialManager.availablePorts[0].portName());
             }
             background: Rectangle {
                 border.width: 2
@@ -103,6 +116,17 @@ Window {
             }
 
             RowLayout {
+                ComboBox {
+                    // model: ["lol", "lol2"]
+                    model: serialManager.availablePortNames
+                    // model: ListModel {
+                    //     id: portList
+                    // }
+                    // delegate: Text {
+                    //     text:
+                    // }
+                }
+
                 // TextField {
                 //     id: host
                 //     implicitHeight: parent.height
@@ -138,36 +162,132 @@ Window {
             }
         }
 
-        Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        Component {
+            id: systemOutputComp
 
-            ScrollView {
-                anchors.fill: parent
+            FlexboxLayout {
+                width: outputList.width
+                justifyContent: FlexboxLayout.JustifyCenter
 
-                TextArea {
-                    id: output
-                    readOnly: true
+                TextField {
+                    text: _str
                     font.pixelSize: 16
+                    readOnly: true
+                    color: "#cdd6f4"
                     background: Rectangle {
-                        border.width: 2
                         radius: 8
                         color: "#1e1e2e"
                     }
                 }
             }
+        }
 
-            Button {
-                x: parent.width - 40
-                y: 8
-                icon.color: "#f38ba8"
-                icon.source: "qrc:/bin.png"
-                onClicked: output.clear()
-                background: Rectangle {
-                    color: "transparent"
+        Component {
+            id: writeOutputComp
+
+            FlexboxLayout {
+                width: outputList.width
+                justifyContent: FlexboxLayout.JustifyEnd
+
+                TextField {
+                    text: _str
+                    font.pixelSize: 16
+                    readOnly: true
+                    color: "#cdd6f4"
+                    background: Rectangle {
+                        radius: 8
+                        color: "#1e1e2e"
+                    }
+                }
+
+                TextField {
+                    text: _time
+                    font.pixelSize: 12
+                    readOnly: true
+                    background: Rectangle {
+                        color: "transparent"
+                    }
                 }
             }
         }
+
+        Component {
+            id: readOutputComp
+
+            FlexboxLayout {
+                width: outputList.width
+                justifyContent: FlexboxLayout.JustifyStart
+
+                TextField {
+                    text: _msg
+                    font.pixelSize: 16
+                    readOnly: true
+                    color: "#cdd6f4"
+                    background: Rectangle {
+                        radius: 8
+                        color: "#1e1e2e"
+                    }
+                }
+
+                TextField {
+                    text: _time
+                    font.pixelSize: 12
+                    readOnly: true
+                    background: Rectangle {
+                        color: "transparent"
+                    }
+                }
+            }
+        }
+
+        ListModel {
+            id: output
+            onCountChanged: outputList.positionViewAtEnd()
+        }
+
+        ListView {
+            id: outputList
+            model: output
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 8
+            delegate: Loader {
+                id: outputLoader
+                property string _str: str
+                property string _time: time
+                sourceComponent: type == "system" ? systemOutputComp : type == "write" ? writeOutputComp : readOutputComp
+            }
+        }
+        // Item {
+        //     Layout.fillWidth: true
+        //     Layout.fillHeight: true
+        //
+        //     ScrollView {
+        //         anchors.fill: parent
+        //
+        //         TextArea {
+        //             id: output
+        //             readOnly: true
+        //             font.pixelSize: 16
+        //             background: Rectangle {
+        //                 border.width: 2
+        //                 radius: 8
+        //                 color: "#1e1e2e"
+        //             }
+        //         }
+        //     }
+        //
+        //     Button {
+        //         x: parent.width - 40
+        //         y: 8
+        //         icon.color: "#f38ba8"
+        //         icon.source: "qrc:/bin.png"
+        //         onClicked: output.clear()
+        //         background: Rectangle {
+        //             color: "transparent"
+        //         }
+        //     }
+        // }
 
         RowLayout {
             TextField {
@@ -195,7 +315,12 @@ Window {
                 enabled: serialManager.isConnected && input.text != "" ? true : false
                 onClicked: {
                     serialManager.send(input.text);
-                    output.append(addTime("Sent: " + input.text));
+                    console.log("sent: ", input.text);
+                    output.append({
+                        str: input.text,
+                        time: getTime(),
+                        type: "write"
+                    });
                     input.clear();
                 }
                 background: Rectangle {
@@ -209,14 +334,13 @@ Window {
     }
 
     Component.onCompleted: {
-        output.text = addTime("Application started");
+        output.append({
+            str: "Application started",
+            time: getTime(),
+            type: "system"
+        });
     }
 
-    function addTime(msg) {
-        var now = new Date();
-        var currentTime = ("0" + now.getHours()).slice(-2) + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + ("0" + now.getSeconds()).slice(-2);
-        return "[" + currentTime + "] " + msg;
-    }
     function getTime() {
         var now = new Date();
         return ("0" + now.getHours()).slice(-2) + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + ("0" + now.getSeconds()).slice(-2);

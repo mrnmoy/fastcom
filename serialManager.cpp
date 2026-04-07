@@ -3,10 +3,13 @@
 SerialManager::SerialManager() : QObject() {
   status = false;
   serialPort = new QSerialPort();
-  availablePorts = serialPortInfo->availablePorts();
-  // for (QSerialPortInfo port : availablePorts) {
-  //   qDebug() << port.portName() << "\n";
-  // }
+  // availablePorts = serialPortInfo->availablePorts();
+  // availablePorts = QSerialPortInfo::availablePorts();
+
+  for (QSerialPortInfo port : QSerialPortInfo::availablePorts()) {
+    availablePortNames.append(port.portName());
+    qDebug() << port.portName() << "\n";
+  }
 }
 
 bool SerialManager::getStatus() { return status; }

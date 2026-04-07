@@ -14,11 +14,12 @@ class SerialManager : public QObject {
 
 public:
   SerialManager();
-
-  QList<QSerialPortInfo> availablePorts;
+  QList<QSerialPortInfo> availablePorts = QSerialPortInfo::availablePorts();
+  QStringList availablePortNames;
 
 signals:
-  void statusChanged(bool);
+  // void availablePorts();
+  void statusChanged(bool status);
   void received(char data);
   void receivedLn();
   void error(QString err);
@@ -37,7 +38,7 @@ private slots:
 
 private:
   QSerialPort *serialPort;
-  QSerialPortInfo *serialPortInfo;
+  // QSerialPortInfo *serialPortInfo;
 
   bool status;
 
