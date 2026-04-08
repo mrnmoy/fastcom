@@ -25,7 +25,7 @@ Window {
                 time: getTime(),
                 type: "system"
             })
-        onReceived: data => outputList.section += data
+        onReceived: data => output.get(output.count - 1).str += data
         onReceivedLn: output.append({
             str: "",
             time: getTime(),
@@ -52,6 +52,7 @@ Window {
             Universal.foreground: "#11111b"
             text: "Start"
             onClicked: {
+                console.log(output.get(output.count - 1).str);
                 serialManager.open(portName.currentValue, baudRate.currentValue, openMode.currentValue);
             }
             background: Rectangle {
@@ -174,6 +175,7 @@ Window {
                     text: _str
                     font.pixelSize: 16
                     readOnly: true
+                    wrapMode: contentWidth > parent.width ? TextInput.Wrap : TextInput.NoWrap
                     color: _subType == "error" ? "#f38ba8" : _subType == "warning" ? "#f9e2af" : "#cdd6f4"
                     background: Rectangle {
                         radius: 8
@@ -194,6 +196,7 @@ Window {
                     text: _str
                     font.pixelSize: 16
                     readOnly: true
+                    wrapMode: contentWidth > parent.width ? TextInput.Wrap : TextInput.NoWrap
                     color: "#cdd6f4"
                     background: Rectangle {
                         radius: 8
@@ -220,9 +223,10 @@ Window {
                 justifyContent: FlexboxLayout.JustifyStart
 
                 TextField {
-                    text: _msg
+                    text: _str
                     font.pixelSize: 16
                     readOnly: true
+                    wrapMode: contentWidth > parent.width ? TextInput.Wrap : TextInput.NoWrap
                     color: "#cdd6f4"
                     background: Rectangle {
                         radius: 8

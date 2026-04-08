@@ -9,12 +9,12 @@
 class SerialManager : public QObject {
   Q_OBJECT
 
-  Q_PROPERTY(bool isConnected READ getStatus NOTIFY statusChanged);
-  Q_PROPERTY(QStringList openModes READ getOpenModes);
+  Q_PROPERTY(bool isConnected READ status NOTIFY statusChanged);
+  Q_PROPERTY(QStringList openModes READ openModes);
   Q_PROPERTY(
-      QStringList availablePorts READ getAvailablePorts NOTIFY statusChanged);
-  Q_PROPERTY(QStringList availableBaudRates READ getAvailableBaudRates);
-  Q_PROPERTY(bool isReadOnly READ getIsReadOnly NOTIFY openModeChanged);
+      QStringList availablePorts READ availablePorts NOTIFY statusChanged);
+  Q_PROPERTY(QStringList availableBaudRates READ availableBaudRates);
+  Q_PROPERTY(bool isReadOnly READ isReadOnly NOTIFY openModeChanged);
 
 public:
   SerialManager();
@@ -22,14 +22,14 @@ public:
 signals:
   void statusChanged(bool status);
   void openModeChanged(bool isReadOnly);
-  void received(char data);
+  void received(QString data);
   void receivedLn();
   void error(QString err);
 
 public slots:
   void open(QString portName, qint64 baudRate, QString openMode);
   void close();
-  qint64 send(QString msg);
+  void send(QByteArray data);
 
 private slots:
   void opened();
@@ -39,13 +39,13 @@ private slots:
 private:
   QSerialPort *serialPort;
 
-  bool status, readOnly;
+  bool _status, _readOnly;
 
-  bool getStatus();
-  bool getIsReadOnly();
-  QStringList getOpenModes();
-  QStringList getAvailablePorts();
-  QStringList getAvailableBaudRates();
+  bool status();
+  bool isReadOnly();
+  QStringList openModes();
+  QStringList availablePorts();
+  QStringList availableBaudRates();
 };
 
 #endif

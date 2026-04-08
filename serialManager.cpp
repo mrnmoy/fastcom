@@ -1,20 +1,20 @@
 #include "serialManager.h"
 
 SerialManager::SerialManager() : QObject() {
-  status = false;
-  readOnly = true;
+  _status = false;
+  _readOnly = true;
   serialPort = new QSerialPort();
 }
 
-bool SerialManager::getStatus() { return status; }
+bool SerialManager::status() { return _status; }
 
-bool SerialManager::getIsReadOnly() { return readOnly; }
+bool SerialManager::isReadOnly() { return _readOnly; }
 
-QStringList SerialManager::getOpenModes() {
+QStringList SerialManager::openModes() {
   return (QStringList() << "ReadOnly" << "WriteOnly" << "ReadWrite");
 }
 
-QStringList SerialManager::getAvailablePorts() {
+QStringList SerialManager::availablePorts() {
   QStringList portNames;
   for (QSerialPortInfo portInfo : QSerialPortInfo::availablePorts()) {
     portNames << portInfo.portName();
@@ -22,9 +22,9 @@ QStringList SerialManager::getAvailablePorts() {
   return portNames;
 }
 
-QStringList SerialManager::getAvailableBaudRates() {
-  return (QStringList() << "1200" << "2400" << "4800" << "9600" << "19200"
-                        << "38400" << "57600" << "115200");
+QStringList SerialManager::availableBaudRates() {
+  return (QStringList() << "115200" << "57600" << "38400" << "19200" << "9600"
+                        << "4800" << "2400" << "1200");
 }
 
 void SerialManager::open(QString portName, qint64 baudRate, QString openMode) {
@@ -35,16 +35,16 @@ void SerialManager::open(QString portName, qint64 baudRate, QString openMode) {
 
   if (openMode == "ReadWrite") {
     _openMode = QIODevice::ReadWrite;
-    readOnly = false;
+    _readOnly = false;
   } else if (openMode == "WriteOnly") {
     _openMode = QIODevice::WriteOnly;
-    readOnly = false;
+    _readOnly = false;
   } else {
     _openMode = QIODevice::ReadOnly;
-    readOnly = true;
+    _readOnly = true;
   }
 
-  emit openModeChanged(readOnly);
+  emit openModeChanged(_readOnly);
 
   if (!serialPort->open(_openMode)) {
     emit error("Failed to open " + portName + ", " + serialPort->errorString());
@@ -54,8 +54,8 @@ void SerialManager::open(QString portName, qint64 baudRate, QString openMode) {
   QObject::connect(serialPort, &QSerialPort::readyRead, this,
                    &SerialManager::readyRead);
 
-  status = true;
-  emit statusChanged(status);
+  _status = true;
+  emit statusChanged(_status);
 }
 
 void SerialManager::close() {
@@ -64,27 +64,29 @@ void SerialManager::close() {
   if (serialPort->isOpen())
     serialPort->close();
 
-  status = false;
-  emit statusChanged(status);
+  _status = false;
+  emit statusChanged(_status);
 }
-
-qint64 SerialManager::send(QString msg) {}
 
 void SerialManager::opened() {}
 void SerialManager::closed() {}
 
 void SerialManager::readyRead() {
   if (serialPort->isOpen()) {
-    // const qint64 BUF_SIZE = 1024;
-    // char buf[BUF_SIZE];
     QByteArray buf = serialPort->readAll();
     qDebug() << "Data received:";
+    emit receivedLn();
     for (qint64 i = 0; i < buf.size(); i++) {
       if (buf[i] == '\n')
         emit receivedLn();
       qDebug() << buf[i];
-      emit received(buf[i]);
+      emit received(QString(buf[i]));
     }
-    // Process the received data...
+  }
+}
+
+void SerialManager::send(QByteArray data) {
+  if (!serialPort->write(data)) {
+    emit error("Unable to write");
   }
 }
