@@ -11,23 +11,24 @@ class SerialManager : public QObject {
   Q_OBJECT
 
   Q_PROPERTY(bool isConnected READ getStatus NOTIFY statusChanged);
+  Q_PROPERTY(QStringList openModes READ getOpenModes);
+  Q_PROPERTY(
+      QStringList availablePorts READ getAvailablePorts NOTIFY statusChanged);
+  Q_PROPERTY(QStringList availableBaudRates READ getAvailableBaudRates);
+  Q_PROPERTY(bool isReadOnly READ getIsReadOnly NOTIFY openModeChanged);
 
 public:
   SerialManager();
-  QList<QSerialPortInfo> availablePorts = QSerialPortInfo::availablePorts();
-  QStringListModel *availablePortNames;
-  QStringList availableBaudRates = {"1200",  "2400",  "4800",  "9600",
-                                    "19200", "38400", "57600", "115200"};
 
 signals:
-  // void availablePorts();
   void statusChanged(bool status);
+  void openModeChanged(bool isReadOnly);
   void received(char data);
   void receivedLn();
   void error(QString err);
 
 public slots:
-  void open(QString portName, qint64 baudRate);
+  void open(QString portName, qint64 baudRate, QString openMode);
   void close();
   qint64 send(QString msg);
 
@@ -40,9 +41,13 @@ private:
   QSerialPort *serialPort;
   // QSerialPortInfo *serialPortInfo;
 
-  bool status;
+  bool status, readOnly;
 
   bool getStatus();
+  bool getIsReadOnly();
+  QStringList getOpenModes();
+  QStringList getAvailablePorts();
+  QStringList getAvailableBaudRates();
 };
 
 #endif // SERIAL_H

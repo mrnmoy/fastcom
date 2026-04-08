@@ -2,35 +2,51 @@
 
 SerialManager::SerialManager() : QObject() {
   status = false;
+  readOnly = true;
   serialPort = new QSerialPort();
-
-  // availableBaudRates = {"1200",  "2400",  "4800",  "9600",
-  //                       "19200", "38400", "57600", "115200"};
-  availableBaudRates =
-      (QStringList() << "1200" << "2400" << "4800" << "9600" << "19200"
-                     << "38400" << "57600" << "115200");
-
-  // availablePorts = serialPortInfo->availablePorts();
-  // availablePorts = QSerialPortInfo::availablePorts();
-
-  availablePortNames = new QStringListModel();
-  QStringList portNames;
-  // for (int i = 0; i < availablePorts.size(); i++) {
-  for (QSerialPortInfo portInfo : QSerialPortInfo::availablePorts()) {
-    // portNames.append(port.portName());
-    // availablePortNames.append(portInfo.portName());
-    qDebug() << portInfo.portName() << "\n";
-  }
-  availablePortNames->setStringList(portNames);
 }
 
 bool SerialManager::getStatus() { return status; }
 
-void SerialManager::open(QString portName, qint64 baudRate) {
+bool SerialManager::getIsReadOnly() { return readOnly; }
+
+QStringList SerialManager::getOpenModes() {
+  return (QStringList() << "ReadOnly" << "WriteOnly" << "ReadWrite");
+}
+
+QStringList SerialManager::getAvailablePorts() {
+  QStringList portNames;
+  for (QSerialPortInfo portInfo : QSerialPortInfo::availablePorts()) {
+    portNames << portInfo.portName();
+  }
+  return portNames;
+}
+
+QStringList SerialManager::getAvailableBaudRates() {
+  return (QStringList() << "1200" << "2400" << "4800" << "9600" << "19200"
+                        << "38400" << "57600" << "115200");
+}
+
+void SerialManager::open(QString portName, qint64 baudRate, QString openMode) {
   serialPort->setPortName(portName);
   serialPort->setBaudRate(baudRate);
 
-  if (!serialPort->open(QIODevice::ReadWrite)) {
+  QIODeviceBase::OpenMode _openMode;
+
+  if (openMode == "ReadWrite") {
+    _openMode = QIODevice::ReadWrite;
+    readOnly = false;
+  } else if (openMode == "WriteOnly") {
+    _openMode = QIODevice::WriteOnly;
+    readOnly = false;
+  } else {
+    _openMode = QIODevice::ReadOnly;
+    readOnly = true;
+  }
+
+  emit openModeChanged(readOnly);
+
+  if (!serialPort->open(_openMode)) {
     emit error("Failed to open " + portName + ", " + serialPort->errorString());
     return;
   }

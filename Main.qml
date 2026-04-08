@@ -52,9 +52,7 @@ Window {
             Universal.foreground: "#11111b"
             text: "Start"
             onClicked: {
-                serialManager.open(portName.currentValue, baudRate.currentValue);
-                // console.log(portName.currentValue);
-                // console.log(serialManager.availableBaudRates[0]);
+                serialManager.open(portName.currentValue, baudRate.currentValue, openMode.currentValue);
             }
             background: Rectangle {
                 border.width: 2
@@ -122,13 +120,14 @@ Window {
                     id: portName
                     font.pixelSize: 16
                     enabled: !serialManager.isConnected
-                    model: ["ttyUSB0", "ttyUSB1"]
+                    // model: ["ttyUSB0", "ttyUSB1"]
+                    model: serialManager.availablePorts
                     // background: Rectangle {
                     // radius: 8
                     //     color: "#1e1e2e"
                     // }
                     delegate: ItemDelegate {
-                        width: parent.width
+                        // width: parent.width
                         font.pixelSize: 16
                         // height: 24
                         text: modelData
@@ -140,45 +139,23 @@ Window {
                         required property int index
                         required property string modelData
                     }
-                    // model: serialManager.availablePortNames
                 }
 
                 ComboBox {
                     id: baudRate
                     font.pixelSize: 16
                     enabled: !serialManager.isConnected
-                    model: ["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
-                    // model: serialManager.availableBaudRates
+                    // model: ["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
+                    model: serialManager.availableBaudRates
                 }
 
-                // TextField {
-                //     id: host
-                //     implicitHeight: parent.height
-                //     implicitWidth: 130
-                //     font.pixelSize: 16
-                //     text: "localhost"
-                //     enabled: !tcpServer.isListening && !tcpServer.isConnected
-                //     background: Rectangle {
-                //         border.width: 2
-                //         radius: 8
-                //         color: "#1e1e2e"
-                //     }
-                // }
-                //
-                // TextField {
-                //     id: port
-                //     implicitHeight: parent.height
-                //     implicitWidth: 76
-                //     font.pixelSize: 16
-                //     text: "1234"
-                //     validator: IntValidator {}
-                //     enabled: !tcpServer.isListening && !tcpServer.isConnected
-                //     background: Rectangle {
-                //         border.width: 2
-                //         radius: 8
-                //         color: "#1e1e2e"
-                //     }
-                // }
+                ComboBox {
+                    id: openMode
+                    font.pixelSize: 16
+                    enabled: !serialManager.isConnected
+                    // model: ["Read only", "Write only", "ReadWrite"]
+                    model: serialManager.openModes
+                }
 
                 Loader {
                     sourceComponent: serialManager.isConnected ? openedActions : closedActions
@@ -285,6 +262,8 @@ Window {
         }
 
         RowLayout {
+            enabled: serialManager.isConnected && !serialManager.isReadOnly
+
             TextField {
                 id: input
                 implicitHeight: sendBtn.height
@@ -307,7 +286,7 @@ Window {
                 font.pixelSize: 16
                 Universal.foreground: "#11111b"
                 text: "Send"
-                enabled: serialManager.isConnected && input.text != "" ? true : false
+                enabled: input.text != ""
                 onClicked: {
                     serialManager.send(input.text);
                     output.append({
