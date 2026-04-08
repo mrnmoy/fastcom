@@ -1,8 +1,10 @@
 #include "serialManager.h"
+#include <cstddef>
 
 SerialManager::SerialManager() : QObject() {
   _status = false;
   _readOnly = true;
+  _pendingLn = true;
   serialPort = new QSerialPort();
 }
 
@@ -11,7 +13,7 @@ bool SerialManager::status() { return _status; }
 bool SerialManager::isReadOnly() { return _readOnly; }
 
 QStringList SerialManager::openModes() {
-  return (QStringList() << "ReadOnly" << "WriteOnly" << "ReadWrite");
+  return (QStringList() << "ReadWrite" << "ReadOnly" << "WriteOnly");
 }
 
 QStringList SerialManager::availablePorts() {
@@ -73,19 +75,28 @@ void SerialManager::closed() {}
 
 void SerialManager::readyRead() {
   if (serialPort->isOpen()) {
-    QByteArray buf = serialPort->readAll();
+    const QByteArray buf = serialPort->readAll();
     qDebug() << "Data received:";
-    emit receivedLn();
     for (qint64 i = 0; i < buf.size(); i++) {
-      if (buf[i] == '\n')
+      if (_pendingLn) {
         emit receivedLn();
-      qDebug() << buf[i];
-      emit received(QString(buf[i]));
+        _pendingLn = false;
+      }
+      if (buf.at(i) == '\n') {
+        if (buf.size() == i + 1) {
+          _pendingLn = true;
+        } else {
+          emit receivedLn();
+          _pendingLn = false;
+        }
+      } else {
+        emit received(QString(buf.at(i)));
+      }
     }
   }
 }
 
-void SerialManager::send(QByteArray data) {
+void SerialManager::send(const QByteArray &data) {
   if (!serialPort->write(data)) {
     emit error("Unable to write");
   }

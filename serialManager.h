@@ -29,7 +29,7 @@ signals:
 public slots:
   void open(QString portName, qint64 baudRate, QString openMode);
   void close();
-  void send(QByteArray data);
+  void send(const QByteArray &data);
 
 private slots:
   void opened();
@@ -39,7 +39,7 @@ private slots:
 private:
   QSerialPort *serialPort;
 
-  bool _status, _readOnly;
+  bool _status, _readOnly, _pendingLn;
 
   bool status();
   bool isReadOnly();

@@ -6,7 +6,7 @@ import SerialManager
 
 Window {
     id: window
-    width: 640
+    width: 660
     height: 400
     visible: true
     title: qsTr("Hello World")
@@ -117,45 +117,75 @@ Window {
             }
 
             RowLayout {
-                ComboBox {
-                    id: portName
-                    font.pixelSize: 16
+                RowLayout {
                     enabled: !serialManager.isConnected
-                    // model: ["ttyUSB0", "ttyUSB1"]
-                    model: serialManager.availablePorts
-                    // background: Rectangle {
-                    // radius: 8
-                    //     color: "#1e1e2e"
-                    // }
-                    delegate: ItemDelegate {
-                        // width: parent.width
-                        font.pixelSize: 16
-                        // height: 24
-                        text: modelData
-                        // radius: 8
-                        // color: "#1e1e2e"
-                        highlighted: ListView.isCurrentItem
-                        onClicked: portName.currentIndex = index
 
-                        required property int index
-                        required property string modelData
+                    ComboBox {
+                        id: portName
+                        model: serialManager.availablePorts
+                        spacing: 4
+                        background: Rectangle {
+                            radius: 8
+                            color: "#1e1e2e"
+                        }
+                        contentItem: Text {
+                            text: parent.displayText
+                            font.pixelSize: 16
+                            color: "#cdd6f4"
+                            leftPadding: 8
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        delegate: ItemDelegate {
+                            padding: 0
+                            verticalPadding: 4
+                            horizontalPadding: 8
+                            contentItem: Text {
+                                text: modelData
+                                color: "#cdd6f4"
+                                font.pixelSize: 16
+                            }
+                            background: Rectangle {
+                                // implicitWidth: parent.width
+                                // implicitHeight: parent.height
+                                color: "#1e1e2e"
+                                radius: 8
+                            }
+                            // highlighted: ListView.isCurrentItem
+                            onClicked: portName.currentIndex = index
+
+                            required property int index
+                            required property string modelData
+                        }
+                        popup: Popup {
+                            y: parent.height
+                            width: parent.width
+                            // implicitHeight: contentItem.implicitHeight
+
+                            contentItem: ListView {
+                                spacing: 4
+                                implicitHeight: contentHeight
+                                model: portName.delegateModel
+                                currentIndex: portName.highlightedIndex
+                                ScrollIndicator.vertical: ScrollIndicator {}
+                            }
+                            background: Rectangle {
+                                radius: 8
+                                color: "#1e1e2e"
+                            }
+                        }
                     }
-                }
 
-                ComboBox {
-                    id: baudRate
-                    font.pixelSize: 16
-                    enabled: !serialManager.isConnected
-                    // model: ["1200", "2400", "4800", "9600", "19200", "38400", "57600", "115200"]
-                    model: serialManager.availableBaudRates
-                }
+                    ComboBox {
+                        id: baudRate
+                        font.pixelSize: 16
+                        model: serialManager.availableBaudRates
+                    }
 
-                ComboBox {
-                    id: openMode
-                    font.pixelSize: 16
-                    enabled: !serialManager.isConnected
-                    // model: ["Read only", "Write only", "ReadWrite"]
-                    model: serialManager.openModes
+                    ComboBox {
+                        id: openMode
+                        font.pixelSize: 16
+                        model: serialManager.openModes
+                    }
                 }
 
                 Loader {
@@ -175,7 +205,7 @@ Window {
                     text: _str
                     font.pixelSize: 16
                     readOnly: true
-                    wrapMode: contentWidth > parent.width ? TextInput.Wrap : TextInput.NoWrap
+                    wrapMode: width > parent.width / 1.25 ? TextInput.Wrap : TextInput.NoWrap
                     color: _subType == "error" ? "#f38ba8" : _subType == "warning" ? "#f9e2af" : "#cdd6f4"
                     background: Rectangle {
                         radius: 8
@@ -193,10 +223,11 @@ Window {
                 justifyContent: FlexboxLayout.JustifyEnd
 
                 TextField {
+                    id: writeOutputStr
                     text: _str
                     font.pixelSize: 16
                     readOnly: true
-                    wrapMode: contentWidth > parent.width ? TextInput.Wrap : TextInput.NoWrap
+                    wrapMode: width > parent.width / 1.25 ? TextInput.Wrap : TextInput.NoWrap
                     color: "#cdd6f4"
                     background: Rectangle {
                         radius: 8
@@ -205,6 +236,7 @@ Window {
                 }
 
                 TextField {
+                    id: writeOutputTime
                     text: _time
                     font.pixelSize: 12
                     readOnly: true
@@ -226,7 +258,7 @@ Window {
                     text: _str
                     font.pixelSize: 16
                     readOnly: true
-                    wrapMode: contentWidth > parent.width ? TextInput.Wrap : TextInput.NoWrap
+                    wrapMode: width > parent.width / 1.25 ? TextInput.Wrap : TextInput.NoWrap
                     color: "#cdd6f4"
                     background: Rectangle {
                         radius: 8
