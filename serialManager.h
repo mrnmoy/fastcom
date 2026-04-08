@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QSerialPort>
 #include <QSerialPortInfo>
-#include <QStringListModel>
 
 class SerialManager : public QObject {
   Q_OBJECT
@@ -39,7 +38,6 @@ private slots:
 
 private:
   QSerialPort *serialPort;
-  // QSerialPortInfo *serialPortInfo;
 
   bool status, readOnly;
 
@@ -50,4 +48,4 @@ private:
   QStringList getAvailableBaudRates();
 };
 
-#endif // SERIAL_H
+#endif
