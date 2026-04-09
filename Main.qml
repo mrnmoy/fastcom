@@ -25,11 +25,24 @@ Window {
                 time: getTime(),
                 type: "system"
             })
-        onReceived: data => output.get(output.count - 1).str += data
+        onReceived: data => {
+            const prev = output.get(output.count - 1);
+            if (prev.type == "empty" && data) {
+                console.log("setting to read: ", data);
+                output.set(output.count - 1, {
+                    str: data,
+                    time: getTime(),
+                    type: "read"
+                });
+            } else {
+                console.log("concatinating: ", data);
+                output.setProperty(output.count - 1, "str", prev.str + data);
+            }
+        }
         onReceivedLn: output.append({
             str: "",
             time: getTime(),
-            type: "read"
+            type: "empty"
         })
         onError: err => output.append({
                 str: err,
@@ -179,6 +192,22 @@ Window {
         }
 
         Component {
+            id: emptyLnOutputComp
+
+            TextField {
+                width: outputList.width
+                text: ""
+                font.pixelSize: 16
+                readOnly: true
+                color: "red"
+
+                background: Rectangle {
+                    color: "yellow"
+                }
+            }
+        }
+
+        Component {
             id: systemOutputComp
 
             FlexboxLayout {
@@ -263,6 +292,7 @@ Window {
 
         ListModel {
             id: output
+            onCountChanged: outputList.positionViewAtEnd()
             onDataChanged: outputList.positionViewAtEnd()
         }
 
@@ -276,9 +306,10 @@ Window {
                 id: outputLoader
                 property string _str: str
                 property string _time: time
+                property string _type: type
                 property string _subType: subType
 
-                sourceComponent: type == "system" ? systemOutputComp : type == "write" ? writeOutputComp : readOutputComp
+                sourceComponent: type == "system" ? systemOutputComp : type == "write" ? writeOutputComp : type == "empty" ? emptyLnOutputComp : readOutputComp
             }
         }
 

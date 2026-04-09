@@ -25,6 +25,7 @@ signals:
   void openModeChanged(bool isReadOnly);
   void received(QString data);
   void receivedLn();
+  void receivedEmptyLn();
   void error(QString err);
 
 public slots:

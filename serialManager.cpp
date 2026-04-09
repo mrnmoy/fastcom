@@ -78,7 +78,6 @@ void SerialManager::closed() {}
 void SerialManager::readyRead() {
   if (serialPort->isOpen()) {
     const QByteArray buf = serialPort->readAll();
-    qDebug() << "Data received:";
     for (qint64 i = 0; i < buf.size(); i++) {
       if (_pendingLn) {
         emit receivedLn();
