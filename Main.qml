@@ -134,6 +134,7 @@ Window {
                             leftPadding: 8
                             verticalAlignment: Text.AlignVCenter
                         }
+                        onPressedChanged: serialManager.availablePortsChanged()
                     }
 
                     ComboBox {

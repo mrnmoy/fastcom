@@ -11,8 +11,8 @@ class SerialManager : public QObject {
 
   Q_PROPERTY(bool isConnected READ status NOTIFY statusChanged);
   Q_PROPERTY(QStringList openModes READ openModes);
-  Q_PROPERTY(
-      QStringList availablePorts READ availablePorts NOTIFY statusChanged);
+  Q_PROPERTY(QStringList availablePorts READ availablePorts NOTIFY
+                 availablePortsChanged);
   Q_PROPERTY(QStringList availableBaudRates READ availableBaudRates);
   Q_PROPERTY(bool isReadOnly READ isReadOnly NOTIFY openModeChanged);
 
@@ -21,6 +21,7 @@ public:
 
 signals:
   void statusChanged(bool status);
+  void availablePortsChanged();
   void openModeChanged(bool isReadOnly);
   void received(QString data);
   void receivedLn();

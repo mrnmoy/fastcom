@@ -1,5 +1,4 @@
 #include "serialManager.h"
-#include <cstddef>
 
 SerialManager::SerialManager() : QObject() {
   _status = false;
@@ -8,7 +7,10 @@ SerialManager::SerialManager() : QObject() {
   serialPort = new QSerialPort();
 }
 
-bool SerialManager::status() { return _status; }
+bool SerialManager::status() {
+  _pendingLn = true;
+  return _status;
+}
 
 bool SerialManager::isReadOnly() { return _readOnly; }
 
