@@ -52,7 +52,6 @@ Window {
             Universal.foreground: "#11111b"
             text: "Start"
             onClicked: {
-                console.log(output.get(output.count - 1).str);
                 serialManager.open(portName.currentValue, baudRate.currentValue, openMode.currentValue);
             }
             background: Rectangle {
@@ -135,56 +134,40 @@ Window {
                             leftPadding: 8
                             verticalAlignment: Text.AlignVCenter
                         }
-                        delegate: ItemDelegate {
-                            padding: 0
-                            verticalPadding: 4
-                            horizontalPadding: 8
-                            contentItem: Text {
-                                text: modelData
-                                color: "#cdd6f4"
-                                font.pixelSize: 16
-                            }
-                            background: Rectangle {
-                                // implicitWidth: parent.width
-                                // implicitHeight: parent.height
-                                color: "#1e1e2e"
-                                radius: 8
-                            }
-                            // highlighted: ListView.isCurrentItem
-                            onClicked: portName.currentIndex = index
-
-                            required property int index
-                            required property string modelData
-                        }
-                        popup: Popup {
-                            y: parent.height
-                            width: parent.width
-                            // implicitHeight: contentItem.implicitHeight
-
-                            contentItem: ListView {
-                                spacing: 4
-                                implicitHeight: contentHeight
-                                model: portName.delegateModel
-                                currentIndex: portName.highlightedIndex
-                                ScrollIndicator.vertical: ScrollIndicator {}
-                            }
-                            background: Rectangle {
-                                radius: 8
-                                color: "#1e1e2e"
-                            }
-                        }
                     }
 
                     ComboBox {
                         id: baudRate
                         font.pixelSize: 16
                         model: serialManager.availableBaudRates
+                        background: Rectangle {
+                            radius: 8
+                            color: "#1e1e2e"
+                        }
+                        contentItem: Text {
+                            text: parent.displayText
+                            font.pixelSize: 16
+                            color: "#cdd6f4"
+                            leftPadding: 8
+                            verticalAlignment: Text.AlignVCenter
+                        }
                     }
 
                     ComboBox {
                         id: openMode
                         font.pixelSize: 16
                         model: serialManager.openModes
+                        background: Rectangle {
+                            radius: 8
+                            color: "#1e1e2e"
+                        }
+                        contentItem: Text {
+                            text: parent.displayText
+                            font.pixelSize: 16
+                            color: "#cdd6f4"
+                            leftPadding: 8
+                            verticalAlignment: Text.AlignVCenter
+                        }
                     }
                 }
 
