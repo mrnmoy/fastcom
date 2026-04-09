@@ -263,7 +263,7 @@ Window {
 
         ListModel {
             id: output
-            onCountChanged: outputList.positionViewAtEnd()
+            onDataChanged: outputList.positionViewAtEnd()
         }
 
         ListView {
@@ -277,6 +277,7 @@ Window {
                 property string _str: str
                 property string _time: time
                 property string _subType: subType
+
                 sourceComponent: type == "system" ? systemOutputComp : type == "write" ? writeOutputComp : readOutputComp
             }
         }
